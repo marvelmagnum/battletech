@@ -1,0 +1,48 @@
+{
+    "mechType": "HER-2S Hermes II",
+    "movementPoint": {
+        "walk": 6,
+        "run": 9
+    },
+    "tonnage": 40,
+    "mechWarrior": {
+        "name": "John Doe",
+        "gunnery": 5,
+        "piloting": 4
+    },
+    "armorValues": [
+        {
+            "location": 0,
+            "armor": 9
+        },
+        {
+            "location": 1,
+            "armor": 14
+        },
+        {
+            "location": 3,
+            "armor": 14
+        },
+        {
+            "location": 2,
+            "armor": 17
+        },
+        {
+            "location": 4,
+            "armor": 11
+        },
+        {
+            "location": 5,
+            "armor": 11
+        },
+        {
+            "location": 6,
+            "armor": 14
+        },
+        {
+            "location": 7,
+            "armor": 14
+        }
+    ],
+    "weapons": []
+}
