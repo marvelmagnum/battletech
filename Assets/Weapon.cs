@@ -37,3 +37,9 @@ public class Ammo
     public string ammoType;
     public int amount;
 }
+
+[Serializable]
+public class WeaponData
+{
+    public List<Weapon> weapons;
+}

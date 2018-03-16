@@ -1,10 +1,74 @@
 {
-    "type": "Autocannon 5",
-    "damage": 5,
-    "range": {
-        "close": 6,
-        "medium": 12,
-        "far": 18
-    },
-    "categoryValue": "Projectile"
+	"weapons":	[
+		{
+			"type": "Autocannon 5",
+			"damage": 5,
+			"range": {
+				"close": 6,
+				"medium": 12,
+				"far": 18
+			},
+			"categoryValue": "Projectile"
+		},
+		{
+			"type": "Autocannon 10",
+			"damage": 10,
+			"range": {
+				"close": 5,
+				"medium": 10,
+				"far": 15
+			},
+			"categoryValue": "Projectile"
+		},
+		{
+			"type": "Autocannon 20",
+			"damage": 20,
+			"range": {
+				"close": 3,
+				"medium": 6,
+				"far": 9
+			},
+			"categoryValue": "Projectile"
+		},
+		{
+			"type": "Large Laser",
+			"damage": 8,
+			"range": {
+				"close": 5,
+				"medium": 10,
+				"far": 15
+			},
+			"categoryValue": "Energy"
+		},
+		{
+			"type": "Medium Laser",
+			"damage": 5,
+			"range": {
+				"close": 3,
+				"medium": 6,
+				"far": 9
+			},
+			"categoryValue": "Energy"
+		},
+		{
+			"type": "Small Laser",
+			"damage": 3,
+			"range": {
+				"close": 1,
+				"medium": 2,
+				"far": 3
+			},
+			"categoryValue": "Energy"
+		},
+		{
+			"type": "Flamer",
+			"damage": 2,
+			"range": {
+				"close": 1,
+				"medium": 2,
+				"far": 3
+			},
+			"categoryValue": "Energy"
+		}
+	]
 }

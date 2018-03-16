@@ -1,47 +1,192 @@
 {
-    "mechType": "HER-2S Hermes II",
-    "movementPoint": {
-        "walk": 6,
-        "run": 9
-    },
-    "tonnage": 40,
-    "mechWarrior": {
-        "name": "John Doe",
-        "gunnery": 5,
-        "piloting": 4
-    },
-    "armorValues": [
+    "mechs": [
         {
-            "location": "Head",
-            "armor": 9
+            "mechType": "HER-2S Hermes II",
+            "movementPoint": {
+                "walk": 6,
+                "run": 9
+            },
+            "tonnage": 40,
+            "mechWarrior": {
+                "name": "John Doe",
+                "gunnery": 4,
+                "piloting": 4
+            },
+            "armorValues": [
+                {
+                    "location": "Head",
+                    "armor": 9
+                },
+                {
+                    "location": "LeftTorso",
+                    "armor": 14
+                },
+                {
+                    "location": "RightTorso",
+                    "armor": 14
+                },
+                {
+                    "location": "CenterTorso",
+                    "armor": 17
+                },
+                {
+                    "location": "LeftArm",
+                    "armor": 11
+                },
+                {
+                    "location": "RightArm",
+                    "armor": 11
+                },
+                {
+                    "location": "LeftLeg",
+                    "armor": 14
+                },
+                {
+                    "location": "RightLeg",
+                    "armor": 14
+                }
+            ]
         },
         {
-            "location": "LeftTorso",
-            "armor": 14
+            "mechType": "HBK-4G Hunchback",
+            "movementPoint": {
+                "walk": 4,
+                "run": 6
+            },
+            "tonnage": 50,
+            "mechWarrior": {
+                "name": "Mark Wallace",
+                "gunnery": 4,
+                "piloting": 4
+            },
+            "armorValues": [
+                {
+                    "location": "Head",
+                    "armor": 9
+                },
+                {
+                    "location": "LeftTorso",
+                    "armor": 20
+                },
+                {
+                    "location": "RightTorso",
+                    "armor": 20
+                },
+                {
+                    "location": "CenterTorso",
+                    "armor": 26
+                },
+                {
+                    "location": "LeftArm",
+                    "armor": 16
+                },
+                {
+                    "location": "RightArm",
+                    "armor": 16
+                },
+                {
+                    "location": "LeftLeg",
+                    "armor": 20
+                },
+                {
+                    "location": "RightLeg",
+                    "armor": 20
+                }
+            ]
         },
-        {
-            "location": "RightTorso",
-            "armor": 14
+		{
+            "mechType": "CDA-2A Cicada",
+            "movementPoint": {
+                "walk": 8,
+                "run": 12
+            },
+            "tonnage": 40,
+            "mechWarrior": {
+                "name": "Gromm Barnes",
+                "gunnery": 4,
+                "piloting": 4
+            },
+            "armorValues": [
+                {
+                    "location": "Head",
+                    "armor": 9
+                },
+                {
+                    "location": "LeftTorso",
+                    "armor": 6
+                },
+                {
+                    "location": "RightTorso",
+                    "armor": 6
+                },
+                {
+                    "location": "CenterTorso",
+                    "armor": 11
+                },
+                {
+                    "location": "LeftArm",
+                    "armor": 4
+                },
+                {
+                    "location": "RightArm",
+                    "armor": 4
+                },
+                {
+                    "location": "LeftLeg",
+                    "armor": 6
+                },
+                {
+                    "location": "RightLeg",
+                    "armor": 6
+                }
+            ]
         },
-        {
-            "location": "CenterTorso",
-            "armor": 17
-        },
-        {
-            "location": "LeftArm",
-            "armor": 11
-        },
-        {
-            "location": "RightArm",
-            "armor": 11
-        },
-        {
-            "location": "LeftLeg",
-            "armor": 14
-        },
-        {
-            "location": "RightLeg",
-            "armor": 14
+		{
+            "mechType": "ENF-4R Enforcer",
+            "movementPoint": {
+                "walk": 4,
+                "run": 6
+            },
+            "tonnage": 50,
+            "mechWarrior": {
+                "name": "Sam Witter",
+                "gunnery": 4,
+                "piloting": 4
+            },
+            "armorValues": [
+                {
+                    "location": "Head",
+                    "armor": 9
+                },
+                {
+                    "location": "LeftTorso",
+                    "armor": 17
+                },
+                {
+                    "location": "RightTorso",
+                    "armor": 17
+                },
+                {
+                    "location": "CenterTorso",
+                    "armor": 23
+                },
+                {
+                    "location": "LeftArm",
+                    "armor": 14
+                },
+                {
+                    "location": "RightArm",
+                    "armor": 14
+                },
+                {
+                    "location": "LeftLeg",
+                    "armor": 20
+                },
+                {
+                    "location": "RightLeg",
+                    "armor": 20
+                }
+            ]
         }
     ]
 }

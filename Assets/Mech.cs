@@ -51,3 +51,9 @@ public struct ArmorValues
     public string location;
     public int armor;
 }
+
+[Serializable]
+public class MechData
+{
+    public List<Mech> mechs;
+}
