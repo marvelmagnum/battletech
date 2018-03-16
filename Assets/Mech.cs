@@ -10,11 +10,14 @@ public class Mech
     public MovementPoint movementPoint;
     public int tonnage;
     public MechWarrior mechWarrior;
+
     Dictionary<MechLocation, int> armor;
     public ArmorValues [] armorValues;
+
     List<Weapon> weapons;
 }
 
+[Serializable]
 public enum MechLocation
 {
     Head,
@@ -45,6 +48,6 @@ public struct MechWarrior
 [Serializable]
 public struct ArmorValues
 {
-    public MechLocation location;
+    public string location;
     public int armor;
 }

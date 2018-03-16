@@ -1,0 +1,10 @@
+{
+    "type": "Autocannon 5",
+    "damage": 5,
+    "range": {
+        "close": 6,
+        "medium": 12,
+        "far": 18
+    },
+    "categoryValue": "Projectile"
+}

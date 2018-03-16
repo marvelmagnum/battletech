@@ -12,37 +12,36 @@
     },
     "armorValues": [
         {
-            "location": 0,
+            "location": "Head",
             "armor": 9
         },
         {
-            "location": 1,
+            "location": "LeftTorso",
             "armor": 14
         },
         {
-            "location": 3,
+            "location": "RightTorso",
             "armor": 14
         },
         {
-            "location": 2,
+            "location": "CenterTorso",
             "armor": 17
         },
         {
-            "location": 4,
+            "location": "LeftArm",
             "armor": 11
         },
         {
-            "location": 5,
+            "location": "RightArm",
             "armor": 11
         },
         {
-            "location": 6,
+            "location": "LeftLeg",
             "armor": 14
         },
         {
-            "location": 7,
+            "location": "RightLeg",
             "armor": 14
         }
-    ],
-    "weapons": []
+    ]
 }
