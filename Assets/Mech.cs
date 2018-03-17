@@ -14,7 +14,28 @@ public class Mech
     Dictionary<MechLocation, int> armor;
     public ArmorValues [] armorValues;
 
-    List<Weapon> weapons;
+    List<Weapon> weapons = new List<Weapon>();
+    List<Ammo> ammunitions = new List<Ammo>();
+
+    public void BuildArmor()
+    {
+        armor = new Dictionary<MechLocation, int>();
+        foreach (ArmorValues a in armorValues)
+        {
+            MechLocation loc = (MechLocation)Enum.Parse(typeof(MechLocation), a.location);
+            armor[loc] = a.armor;
+        }
+    }
+
+    public void AttachWeapon(Weapon weapon)
+    {
+        weapons.Add(weapon);
+    }
+
+    public void LoadAmmo(Ammo ammo)
+    {
+        ammunitions.Add(ammo);
+    }
 }
 
 [Serializable]
@@ -55,5 +76,5 @@ public struct ArmorValues
 [Serializable]
 public class MechData
 {
-    public List<Mech> mechs;
+    public List<Mech> mechs = new List<Mech>();
 }
