@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using System;
 
 [Serializable]
@@ -12,10 +10,16 @@ public class Mech
     public MechWarrior mechWarrior;
 
     Dictionary<MechLocation, int> armor;
-    public ArmorValues [] armorValues;
+    public ArmorValues[] armorValues;
 
     List<Weapon> weapons = new List<Weapon>();
     List<Ammo> ammunitions = new List<Ammo>();
+
+    public bool Destroyed
+    {
+        get;
+        private set;
+    }
 
     public void BuildArmor()
     {

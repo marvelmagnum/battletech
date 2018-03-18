@@ -1,267 +1,170 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 using UnityEngine.UI;
-using System;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 public class BattleTechSim : MonoBehaviour
 {
-    [Header("UI Elements")]
-    public Dropdown[] mechDropdowns;
-    public Dropdown[] weaponDropdowns;
-    public Dropdown[] locationDropdowns;
-    public Dropdown[] ammoDropdowns;
-    public Text[] ammoCounts;
-    public Transform[] buildListContents;
-    public Transform[] teamListContents;
-    public Text[] teamTonnageValues;
-    public GameObject listItemPrefab;
+    public Text battleStream;
+    public float streamDelay;
 
-    [HideInInspector]
-    public MechData mechData;
-    [HideInInspector]
-    public WeaponData weaponData;
+    const int maxLines = 26;
+    const string pageEnd = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\nContinue...";
 
-    const string TypeMech = "[M] ";
-    const string TypeWeapon = "[W] ";
-    const string TypeAmmo = "[A] ";
-    const string PartToken = "#";
+    MechData[] teams;
+    bool isStreaming;
+    bool isWaiting;
+    int lineIndex = 26;
+    float lastStream;
+    List<Mech> turnOrder = new List<Mech>();
+    int turnIndex;
 
-    float buildxPos = 5f;
-    float buildyPos = -25f;
-    float yGap = 15f;
+    enum State
+    {
+        Begin,
+        Initiative,
+        Movement,
+        Weapon,
+        End,
+    }
+    State battleState;
 
-    int itemCountA;
-    int itemCountB;
-
-    int mechCountA;
-    int mechCountB;
-
-    MechData[] teams = { new MechData(), new MechData() };
-
-    // Use this for initialization
+	// Use this for initialization
 	void Start ()
     {
-        LoadData();
-        PopulateUI();
+        isStreaming = false;
+        isWaiting = false;
 
-        itemCountA = itemCountB = 0;
-        mechCountA = mechCountB = 0;
+        battleState = State.Begin;
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-		
-	}
-
-
-    void LoadData()
-    {
-        string mechJson = File.ReadAllText(Application.dataPath + "/MechData.txt");
-        mechData = JsonUtility.FromJson<MechData>(mechJson);
-
-        string weaponJson = File.ReadAllText(Application.dataPath + "/WeaponData.txt");
-        weaponData = JsonUtility.FromJson<WeaponData>(weaponJson);
-    }
-
-    void PopulateUI()
-    {
-        List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
-
-        foreach (Mech mech in mechData.mechs)
-            options.Add(new Dropdown.OptionData(mech.mechType));
-        foreach (Dropdown mechDD in mechDropdowns)
+        if (!isStreaming) return;
+        if (isWaiting)
         {
-            mechDD.ClearOptions();
-            mechDD.AddOptions(options);
+            if (!Input.anyKey)
+                return;
+
+            battleStream.text = string.Empty;
+            lineIndex = 0;
+            isWaiting = false;
         }
-        options.Clear();
+        if (Time.time - lastStream < streamDelay)
+            return;
 
-        foreach (Weapon weapon in weaponData.weapons)
-            options.Add(new Dropdown.OptionData(weapon.type));
-        foreach (Dropdown weaponDD in weaponDropdowns)
+        while (!IsBattleOver())
         {
-            weaponDD.ClearOptions();
-            weaponDD.AddOptions(options);
-        }
-        options.Clear();
-
-        List<string> mechLocations = Enum.GetNames(typeof(MechLocation)).ToList();
-        foreach (string loc in mechLocations)
-        {
-            char[] result = loc.Where(c => char.IsUpper(c)).ToArray();
-            options.Add(new Dropdown.OptionData(new string(result)));
-        }
-        foreach (Dropdown locDD in locationDropdowns)
-        {
-            locDD.ClearOptions();
-            locDD.AddOptions(options);
-        }
-        options.Clear();
-
-        foreach (Weapon weapon in weaponData.weapons)
-        {
-            if (weapon.categoryValue.Equals("Projectile"))
-                options.Add(new Dropdown.OptionData(weapon.type));
-        }
-        foreach (Dropdown ammoDD in ammoDropdowns)
-        {
-            ammoDD.ClearOptions();
-            ammoDD.AddOptions(options);
-        }
-    }
-
-    public void AddMech(int team)
-    {
-        GameObject item;
-        item = Instantiate(listItemPrefab);
-        item.transform.SetParent(buildListContents[team]);
-        item.transform.localPosition = new Vector3(buildxPos, buildyPos - ((team == 0 ? itemCountA++ : itemCountB++) * yGap), 0f);
-        item.GetComponent<Text>().text = TypeMech + mechDropdowns[team].options[mechDropdowns[team].value].text;
-    }
-
-    public void AddWeapon(int team)
-    {
-        GameObject item;
-        item = Instantiate(listItemPrefab);
-        item.transform.SetParent(buildListContents[team]);
-        item.transform.localPosition = new Vector3(buildxPos, buildyPos - ((team == 0 ? itemCountA++ : itemCountB++) * yGap), 0f);
-        item.GetComponent<Text>().text = TypeWeapon + weaponDropdowns[team].options[weaponDropdowns[team].value].text + " (" + locationDropdowns[team].options[locationDropdowns[team].value].text + ")";
-    }
-
-    public void AddAmmo(int team)
-    {
-        if (ammoCounts[team].text == string.Empty) return;      // Ammo amount cannot be 0
-
-        GameObject item;
-        item = Instantiate(listItemPrefab);
-        item.transform.SetParent(buildListContents[team]);
-        item.transform.localPosition = new Vector3(buildxPos, buildyPos - ((team == 0 ? itemCountA++ : itemCountB++) * yGap), 0f);
-        item.GetComponent<Text>().text = TypeAmmo + ammoDropdowns[team].options[ammoDropdowns[team].value].text + " (" + ammoCounts[team].text + ")";
-    }
-
-    public void BuildMech(int team)
-    {
-        string selectedMech = string.Empty;
-        List<string> selectedWeapons = new List<string>();
-        List<string> selectedAmmunitions = new List<string>();
-
-        Text[] items = buildListContents[team].GetComponentsInChildren<Text>();
-        foreach(Text buildItem in items)
-        {
-            if (buildItem.text.Contains(TypeMech))
+            switch (battleState)
             {
-                if (selectedMech == string.Empty)
-                    selectedMech = buildItem.text.Substring(TypeMech.Length);
-                else
+                case State.Begin:
+                    Debug.Log("battle start");
+                    Stream("Battle start.");
+                    battleState = State.Initiative;
+                    break;
+
+                case State.Initiative:
+                    Debug.Log("generate turn order.");
+                    GenerateTurnOrder();
+                    turnIndex = 0;
+                    battleState = State.Movement;
+                    break;
+
+                case State.Movement:
+                    Debug.Log("Moving mech no. " + turnIndex);
+                    Move(turnIndex++);
+                    if (turnIndex >= turnOrder.Count)
+                        battleState = State.Weapon;
+                    break;
+
+                case State.Weapon:
+                    break;
+            }
+        }
+        lastStream = Time.time;
+    }
+
+    void Move(int i)
+    {
+        Stream(turnOrder[i].mechType + " moves.");
+    }
+
+    int Roll(int numDice = 1)
+    {
+        return Random.Range(numDice, (numDice * 6) + 1);
+    }
+
+    private void GenerateTurnOrder()
+    {
+        MechData firstTeam, secondTeam;
+        DetermineInitiative(out firstTeam, out secondTeam);
+
+        for (int i = 0; i < firstTeam.mechs.Count; ++i)
+        {
+            turnOrder.Add(firstTeam.mechs[i]);
+            if (i < secondTeam.mechs.Count)
+                turnOrder.Add(secondTeam.mechs[i]);
+        }
+    }
+
+    void DetermineInitiative(out MechData firstTeam, out MechData secondTeam)
+    {
+        int iniA = Roll(2);
+        int iniB = Roll(2);
+        while (iniA == iniB)
+        {
+            iniA = Roll(2);
+            iniB = Roll(2);
+        }
+        if (iniA > iniB)
+        {
+            firstTeam = teams[1];
+            secondTeam = teams[0];
+        }
+        else
+        {
+            firstTeam = teams[0];
+            secondTeam = teams[1];
+        }
+    }
+
+    bool IsBattleOver()
+    {
+        bool over = true;
+        foreach (MechData team in teams)
+        {
+            foreach (Mech mech in team.mechs)
+            {
+                if (!mech.Destroyed)
                 {
-                    ClearBuildList(team);   // Cannot have more than one mechtype in build list
-                    return;
+                    over = false;
+                    break;
                 }
             }
-
-            if (buildItem.text.Contains(TypeWeapon))
-            {
-                string weaponText = buildItem.text.Substring(TypeWeapon.Length);
-                string[] parts = weaponText.Split('(');
-                weaponText = parts[0].TrimEnd() + PartToken + parts[1].Substring(0, parts[1].IndexOf(')'));
-                selectedWeapons.Add(weaponText);
-            }
-
-            if (buildItem.text.Contains(TypeAmmo))
-            {
-                string ammoText = buildItem.text.Substring(TypeAmmo.Length);
-                string[] parts = ammoText.Split('(');
-                ammoText = parts[0].TrimEnd() + PartToken + parts[1].Substring(0,parts[1].IndexOf(')'));
-                selectedAmmunitions.Add(ammoText);
-            }
+            if (over)
+                return true;
+            else
+                over = true;
         }
-
-        ClearBuildList(team);
-        ammoCounts[team].GetComponentInParent<InputField>().text = "";
-
-        Mech mech = ConstructMech(selectedMech, selectedWeapons, selectedAmmunitions);
-        teams[team].mechs.Add(mech);
-
-        GameObject item;
-        item = Instantiate(listItemPrefab);
-        item.transform.SetParent(teamListContents[team]);
-        item.transform.localPosition = new Vector3(buildxPos, buildyPos - ((team == 0 ? mechCountA++ : mechCountB++) * yGap), 0f);
-        item.GetComponent<Text>().text = (team == 0 ? mechCountA : mechCountB).ToString() + ". " + mech.mechType;
-
-        int tonnage = 0;
-        foreach (Mech m in teams[team].mechs)
-            tonnage += m.tonnage;
-        teamTonnageValues[team].text = tonnage.ToString() + " tons";
+        return false;
     }
 
-    Mech ConstructMech(string selectedMech, List<string> selectedWeapons, List<string> selectedAmmunitions)
+    internal void StartSimulation(MechData[] t)
     {
-        // Retrive Chassis
-        Mech newMech = GetMech(selectedMech);
-        newMech.BuildArmor();
-        
-        // Attach Weapons
-        foreach (string weaponItem in selectedWeapons)
-        {
-            string[] parts = weaponItem.Split(PartToken.ToCharArray());
-            Weapon newWeapon = GetWeapon(parts[0]);
-            newWeapon.Assemble(parts[1]);
-            newMech.AttachWeapon(newWeapon);
-        }
-
-        // Load Ammo
-        foreach (string ammoItem in selectedAmmunitions)
-        {
-            string[] parts = ammoItem.Split(PartToken.ToCharArray());
-            Ammo newAmmo = new Ammo();
-            newAmmo.ammoType = parts[0];
-            newAmmo.amount = Int32.Parse(parts[1]);
-            newMech.LoadAmmo(newAmmo);
-        }
-
-        return newMech;
+        teams = t;
+        isStreaming = true;
     }
 
-    Mech GetMech(string selectedMech)
+    void Stream(string text)
     {
-        Mech ret = new Mech();
-        foreach (Mech mech in mechData.mechs)
-        {
-            if (mech.mechType.Equals(selectedMech))
-            {
-                ret = mech;
-                break;
-            }
-        }
-        return ret;
-    }
+        battleStream.text += text + "\n";
+        lineIndex++;
+        lastStream = Time.time;
 
-    private Weapon GetWeapon(string weaponItem)
-    {
-        Weapon ret = new Weapon();
-        foreach (Weapon weapon in weaponData.weapons)
+        if (lineIndex >= maxLines)
         {
-            if (weapon.type.Equals(weaponItem))
-            {
-                ret = weapon;
-                break;
-            }
+            battleStream.text += pageEnd;
+            isWaiting = true;
         }
-        return ret;
-    }
-
-    void ClearBuildList(int team)
-    {
-        Text[] items = buildListContents[team].GetComponentsInChildren<Text>();
-        foreach (Text tr in items)
-            Destroy(tr.gameObject);
-        if (team == 0)
-            itemCountA = 0;
-        else
-            itemCountB = 0;
     }
 }
