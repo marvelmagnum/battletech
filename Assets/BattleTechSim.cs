@@ -13,7 +13,7 @@ public class BattleTechSim : MonoBehaviour
     MechData[] teams;
     bool isStreaming;
     bool isWaiting;
-    int lineIndex = 26;
+    int lineIndex = 0;
     float lastStream;
     List<Mech> turnOrder = new List<Mech>();
     int turnIndex;
@@ -53,7 +53,7 @@ public class BattleTechSim : MonoBehaviour
         if (Time.time - lastStream < streamDelay)
             return;
 
-        while (!IsBattleOver())
+        if (!IsBattleOver())
         {
             switch (battleState)
             {
@@ -81,7 +81,6 @@ public class BattleTechSim : MonoBehaviour
                     break;
             }
         }
-        lastStream = Time.time;
     }
 
     void Move(int i)
@@ -151,6 +150,7 @@ public class BattleTechSim : MonoBehaviour
 
     internal void StartSimulation(MechData[] t)
     {
+        Debug.Log("Start sim.");
         teams = t;
         isStreaming = true;
     }
