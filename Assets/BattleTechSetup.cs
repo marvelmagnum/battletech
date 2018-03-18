@@ -20,32 +20,32 @@ public class BattleTechSetup : MonoBehaviour
     public Text[] teamTonnageValues;
     public GameObject listItemPrefab;
 
+    // json data
     [HideInInspector]
     public MechData mechData;
     [HideInInspector]
     public WeaponData weaponData;
 
+    // scrolllist values
     const string TypeMech = "[M] ";
     const string TypeWeapon = "[W] ";
     const string TypeAmmo = "[A] ";
     const string PartToken = "#";
+    const float buildxPos = 5f;
+    const float buildyPos = -25f;
+    const float yGap = 15f;
 
-    float buildxPos = 5f;
-    float buildyPos = -25f;
-    float yGap = 15f;
+    private int itemCountA;
+    private int itemCountB;
+    private int mechCountA;
+    private int mechCountB;
 
-    int itemCountA;
-    int itemCountB;
+    private BattleTechSim sim;
 
-    int mechCountA;
-    int mechCountB;
-
-    BattleTechSim sim;
-
-    MechData[] teams = { new MechData(), new MechData() };
+    private MechData[] teams = { new MechData(), new MechData() };
 
     // Use this for initialization
-	void Start ()
+    private void Start ()
     {
         battleStream.SetActive(false);
         battleSetup.SetActive(true);
@@ -57,15 +57,8 @@ public class BattleTechSetup : MonoBehaviour
         itemCountA = itemCountB = 0;
         mechCountA = mechCountB = 0;
 	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-		
-	}
 
-
-    void LoadData()
+    private void LoadData()
     {
         string mechJson = File.ReadAllText(Application.dataPath + "/MechData.txt");
         mechData = JsonUtility.FromJson<MechData>(mechJson);
@@ -74,7 +67,7 @@ public class BattleTechSetup : MonoBehaviour
         weaponData = JsonUtility.FromJson<WeaponData>(weaponJson);
     }
 
-    void PopulateUI()
+    private void PopulateUI()
     {
         List<Dropdown.OptionData> options = new List<Dropdown.OptionData>();
 
@@ -170,6 +163,7 @@ public class BattleTechSetup : MonoBehaviour
                 }
             }
 
+            // format weapon and ammo strings with '#' separator
             if (buildItem.text.Contains(TypeWeapon))
             {
                 string weaponText = buildItem.text.Substring(TypeWeapon.Length);
@@ -186,11 +180,12 @@ public class BattleTechSetup : MonoBehaviour
                 selectedAmmunitions.Add(ammoText);
             }
         }
-
+        
         ClearBuildList(team);
         ammoCounts[team].GetComponentInParent<InputField>().text = "";
 
         Mech mech = ConstructMech(selectedMech, selectedWeapons, selectedAmmunitions);
+        mech.Team = team;
         teams[team].mechs.Add(mech);
 
         GameObject item;
@@ -205,11 +200,11 @@ public class BattleTechSetup : MonoBehaviour
         teamTonnageValues[team].text = tonnage.ToString() + " tons";
     }
 
-    Mech ConstructMech(string selectedMech, List<string> selectedWeapons, List<string> selectedAmmunitions)
+    private Mech ConstructMech(string selectedMech, List<string> selectedWeapons, List<string> selectedAmmunitions)
     {
         // Retrive Chassis
         Mech newMech = GetMech(selectedMech);
-        newMech.BuildArmor();
+        newMech.Init();
         
         // Attach Weapons
         foreach (string weaponItem in selectedWeapons)
@@ -226,14 +221,14 @@ public class BattleTechSetup : MonoBehaviour
             string[] parts = ammoItem.Split(PartToken.ToCharArray());
             Ammo newAmmo = new Ammo();
             newAmmo.ammoType = parts[0];
-            newAmmo.amount = Int32.Parse(parts[1]);
+            newAmmo.rounds = Int32.Parse(parts[1]);
             newMech.LoadAmmo(newAmmo);
         }
 
         return newMech;
     }
 
-    Mech GetMech(string selectedMech)
+    private Mech GetMech(string selectedMech)
     {
         Mech ret = new Mech();
         foreach (Mech mech in mechData.mechs)
@@ -261,7 +256,7 @@ public class BattleTechSetup : MonoBehaviour
         return ret;
     }
 
-    void ClearBuildList(int team)
+    private void ClearBuildList(int team)
     {
         Text[] items = buildListContents[team].GetComponentsInChildren<Text>();
         foreach (Text tr in items)

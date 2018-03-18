@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using System;
 
 [Serializable]
@@ -8,20 +9,32 @@ public class Mech
     public MovementPoint movementPoint;
     public int tonnage;
     public MechWarrior mechWarrior;
-
-    Dictionary<MechLocation, int> armor;
     public ArmorValues[] armorValues;
 
+    Dictionary<MechLocation, int> armor;
     List<Weapon> weapons = new List<Weapon>();
     List<Ammo> ammunitions = new List<Ammo>();
 
-    public bool Destroyed
+    List<Weapon> disabledWeapons = new List<Weapon>();
+
+    internal bool Destroyed
     {
         get;
         private set;
     }
 
-    public void BuildArmor()
+    internal int Team
+    {
+        get; set;
+    }
+
+    internal void Init()
+    {
+        BuildArmor();   // set armor values from json data
+        Destroyed = false;
+    }
+
+    private void BuildArmor()
     {
         armor = new Dictionary<MechLocation, int>();
         foreach (ArmorValues a in armorValues)
@@ -31,14 +44,100 @@ public class Mech
         }
     }
 
-    public void AttachWeapon(Weapon weapon)
+    internal void AttachWeapon(Weapon weapon)
     {
         weapons.Add(weapon);
     }
 
-    public void LoadAmmo(Ammo ammo)
+    internal void LoadAmmo(Ammo ammo)
     {
         ammunitions.Add(ammo);
+    }
+
+    internal int GenerateFiringCount()
+    {
+        return weapons.Count > 0 ? UnityEngine.Random.Range(1, weapons.Count) : 0;
+    }
+
+    internal int FireWeapon(Mech target)
+    {
+        int weaponIndex = UnityEngine.Random.Range(0, weapons.Count);
+        while (weapons[weaponIndex].HasFired)
+            weaponIndex = UnityEngine.Random.Range(0, weapons.Count);
+
+        BattleTechSim.Instance.Stream(mechType + " fires " + weapons[weaponIndex].type + " at " + target.mechType + ".");
+        if (weapons[weaponIndex].Shoot(ammunitions) == false)  // returns false if weapon is now empty
+        {
+            disabledWeapons.Add(weapons[weaponIndex]);
+            weapons.Remove(weapons[weaponIndex]);
+            BattleTechSim.Instance.Stream(mechType + " has exhausted " + weapons[weaponIndex].type + " ammo.");
+        }
+        return weapons[weaponIndex].GetDamage();    // Return damage done by weapon
+    }
+
+    internal void RechargeWeapons()
+    {
+        foreach (Weapon weapon in weapons)
+            weapon.HasFired = false;
+    }
+
+    internal void Damage(int damage)
+    {
+        MechLocation damageLocation = BattleTechTables.Instance.LookupHitLocation();
+        AssignDamage(damageLocation, damage);
+    }
+
+    private void AssignDamage(MechLocation location, int damage)
+    {
+        if (armor[location] > damage)    // if location can absorb all damage
+        {
+            armor[location] -= damage;
+            BattleTechSim.Instance.Stream(mechType + " takes " + damage + " damage to the " + location.ToString() + ".");
+        }
+        else                    // extra damage transfers inward
+        {
+            damage -= armor[location];
+            armor[location] = 0;
+            BattleTechSim.Instance.Stream(location.ToString() + " destroyed.");
+            DestroyWeapons(location);
+            
+            // Check if mech destroyed
+            if (location == MechLocation.Head || location == MechLocation.CenterTorso)
+            {
+                Destroyed = true;
+                BattleTechSim.Instance.Stream(mechType + " is destroyed.");
+                return;
+            }
+
+            if (damage > 0)
+            {
+                MechLocation transferLocation = BattleTechTables.Instance.LookupDamageTransferLocation(location);
+                AssignDamage(transferLocation, damage);
+            }
+        }
+    }
+
+    private void DestroyWeapons(MechLocation location)
+    {
+        Weapon wp = null;
+        bool found = false;
+
+        foreach(Weapon weapon in weapons)
+        {
+            if (weapon.Location == location)
+            {
+                wp = weapon;
+                found = true;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            disabledWeapons.Add(wp);
+            weapons.Remove(wp);
+            BattleTechSim.Instance.Stream("The " + wp.type + " has been destroyed.");
+        }
     }
 }
 
