@@ -64,13 +64,13 @@ public class Mech
         int weaponIndex = UnityEngine.Random.Range(0, weapons.Count);
         while (weapons[weaponIndex].HasFired)
             weaponIndex = UnityEngine.Random.Range(0, weapons.Count);
-
-        BattleTechSim.Instance.Stream(mechType + " fires " + weapons[weaponIndex].type + " at " + target.mechType + ".");
+        
+        BattleTechSim.Instance.streamBuffer += mechType + " fires " + weapons[weaponIndex].type + " at " + target.mechType + ". ";
         if (weapons[weaponIndex].Shoot(ammunitions) == false)  // returns false if weapon is now empty
         {
             disabledWeapons.Add(weapons[weaponIndex]);
             weapons.Remove(weapons[weaponIndex]);
-            BattleTechSim.Instance.Stream(mechType + " has exhausted " + weapons[weaponIndex].type + " ammo.");
+            BattleTechSim.Instance.streamBuffer += mechType + " has exhausted " + weapons[weaponIndex].type + " ammo. ";
         }
         return weapons[weaponIndex].GetDamage();    // Return damage done by weapon
     }
@@ -89,31 +89,39 @@ public class Mech
 
     private void AssignDamage(MechLocation location, int damage)
     {
-        if (armor[location] > damage)    // if location can absorb all damage
+        if (Destroyed) return;
+         
+        if (armor[location] > 0)    // if location has armor
         {
-            armor[location] -= damage;
-            BattleTechSim.Instance.Stream(mechType + " takes " + damage + " damage to the " + location.ToString() + ".");
-        }
-        else                    // extra damage transfers inward
-        {
-            damage -= armor[location];
-            armor[location] = 0;
-            BattleTechSim.Instance.Stream(location.ToString() + " destroyed.");
-            DestroyWeapons(location);
-            
-            // Check if mech destroyed
-            if (location == MechLocation.Head || location == MechLocation.CenterTorso)
+            if (damage < armor[location])
             {
-                Destroyed = true;
-                BattleTechSim.Instance.Stream(mechType + " is destroyed.");
+                armor[location] -= damage;
+                BattleTechSim.Instance.streamBuffer += mechType + " takes " + damage + " damage to the " + location.ToString() + ". ";
                 return;
             }
-
-            if (damage > 0)
+            else              // extra damage transfers inward
             {
-                MechLocation transferLocation = BattleTechTables.Instance.LookupDamageTransferLocation(location);
-                AssignDamage(transferLocation, damage);
-            }
+                if (armor[location] > 0)
+                {
+                    damage -= armor[location];
+                    armor[location] = 0;
+                    BattleTechSim.Instance.streamBuffer += location.ToString() + " destroyed. ";
+                    DestroyWeapons(location);
+                }
+                // Check if mech destroyed
+                if (location == MechLocation.Head || location == MechLocation.CenterTorso)
+                {
+                    Destroyed = true;
+                    BattleTechSim.Instance.streamBuffer += mechType + " is destroyed. ";
+                    return;
+                }
+
+                if (damage > 0)
+                {
+                    MechLocation transferLocation = BattleTechTables.Instance.LookupDamageTransferLocation(location);
+                    AssignDamage(transferLocation, damage);
+                }
+            }           
         }
     }
 
@@ -136,7 +144,7 @@ public class Mech
         {
             disabledWeapons.Add(wp);
             weapons.Remove(wp);
-            BattleTechSim.Instance.Stream("The " + wp.type + " has been destroyed.");
+            BattleTechSim.Instance.streamBuffer += "The " + wp.type + " has been destroyed. ";
         }
     }
 }

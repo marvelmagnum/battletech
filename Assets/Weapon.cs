@@ -55,7 +55,7 @@ public class Weapon
                     if (ammo.ammoType.Equals(type) && ammo.rounds > 0)
                     {
                         ammo.rounds--;
-                        BattleTechSim.Instance.Stream(ammo.rounds + " ammo remains for " + ammo.ammoType + ".");
+                        BattleTechSim.Instance.streamBuffer += ammo.rounds + " ammo remains. ";
                         return ammo.rounds > 0 ? true : false;
                     }
                 }

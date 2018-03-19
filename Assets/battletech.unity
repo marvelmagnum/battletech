@@ -2231,7 +2231,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battleStream: {fileID: 1101577960}
-  streamDelay: 1
+  streamDelay: 2
 --- !u!4 &346765871
 Transform:
   m_ObjectHideFlags: 0

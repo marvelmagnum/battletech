@@ -36,6 +36,8 @@ public class BattleTechSim : MonoBehaviour
     private int firingCount;
     private int damage;
 
+    internal string streamBuffer;
+
     private enum State
     {
         None,
@@ -46,12 +48,13 @@ public class BattleTechSim : MonoBehaviour
         Weapon,
         Damage,
         NextMech,
+        Summary,
         End,
     }
     private State battleState;
 
     // Use this for initialization
-    private void Start ()
+    private void Start()
     {
         isStreaming = false;
         isWaiting = false;
@@ -59,7 +62,7 @@ public class BattleTechSim : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void Update ()
+    private void Update()
     {
         if (!isStreaming) return;
         if (isWaiting)
@@ -82,14 +85,12 @@ public class BattleTechSim : MonoBehaviour
 
             // Start Battle
             case State.Begin:
-                Debug.Log("battle starts.");
                 Stream("Battle starts.");
                 battleState = State.Initiative;
                 break;
 
             // Roll initiative and determine turn order in round
             case State.Initiative:
-                Debug.Log("generate turn order.");
                 GenerateTurnOrder();
                 turnIndex = 0;
                 battleState = State.Movement;
@@ -97,51 +98,61 @@ public class BattleTechSim : MonoBehaviour
 
             // Moving
             case State.Movement:
-                Debug.Log("moving.");
                 battleState = State.FindOpponent;
                 break;
 
             // Select target and choose weapons
             case State.FindOpponent:
-                Debug.Log("finding opponent.");
                 attacker = turnOrder[turnIndex];
+                if (attacker.Destroyed)     // skip to next mech if this one is destroyed.
+                {
+                    battleState = State.NextMech;
+                    break;
+                }
                 target = GetOpponent(attacker);
                 firingCount = attacker.GenerateFiringCount();   // Determine number of weapons mech will fire
+                Stream(attacker.mechType + " is firing " + firingCount + " weapons. ");
+                if (firingCount == 0)
+                    Stream(attacker.mechType + " has no usable weapons.");
                 battleState = firingCount > 0 ? State.Weapon : State.NextMech;  // If no usable weapons, move to next mech in turn. Else use weapons.
                 break;
 
             // Fire weapon
             case State.Weapon:
-                Debug.Log("firing.");
                 damage = attacker.FireWeapon(target);
+                FlushStream();
                 battleState = State.Damage;
                 break;
 
             // Assign damage. 
             case State.Damage:
-                Debug.Log("damage.");
                 target.Damage(damage);
+                FlushStream();
                 battleState = --firingCount > 0 ? State.Weapon : State.NextMech;    // If more weapons to fire, shoot else next mech
+                Stream(attacker.mechType + " has " + firingCount + " weapons to fire.");
                 break;
 
             // next mech in turn order or start next round 
             case State.NextMech:
-                Debug.Log("next mech.");
                 if (IsBattleOver())
                 {
-                    battleState = State.End;       // Is battle over?
+                    battleState = State.Summary;       // Is battle over?
                     break;
                 }
 
                 attacker.RechargeWeapons();     // reset all weapons
                 turnIndex++;
                 battleState = turnIndex < turnOrder.Count ? State.FindOpponent : State.Initiative;  // if more mech to go this round, then next mech. Else end round.
+                Stream("Next mech.");
                 break;
 
             // Battle ends
-            case State.End:
-                Debug.Log("battle ends.");
+            case State.Summary:
                 Stream("Battle ends. Team " + (GetWinningTeam() == 0 ? "Alpha" : "Beta") + " wins.");
+                battleState = State.End;
+                break;
+
+            case State.End:
                 break;
         }
     }
@@ -149,20 +160,69 @@ public class BattleTechSim : MonoBehaviour
     private Mech GetOpponent(Mech thisMech)
     {
         int oppTeam = thisMech.Team ^ 1; // Toggles between 1 and 0.
-        return teams[oppTeam].mechs[Random.Range(0, teams[oppTeam].mechs.Count)];
+        Mech opp;
+        do
+        {
+            opp = teams[oppTeam].mechs[Random.Range(0, teams[oppTeam].mechs.Count)];
+        } while (opp.Destroyed);
+        return opp;
     }
 
     private void GenerateTurnOrder()
     {
         MechData firstTeam, secondTeam;
         DetermineInitiative(out firstTeam, out secondTeam); // find first and second teams as per turn order
-
-        for (int i = 0; i < firstTeam.mechs.Count; ++i)
+        turnOrder.Clear();
+        int i, j, n;
+        i = j = n = 0;
+        bool t1 = true;
+        while (n < firstTeam.mechs.Count + secondTeam.mechs.Count)
         {
-            turnOrder.Add(firstTeam.mechs[i]);
-            if (i < secondTeam.mechs.Count)
-                turnOrder.Add(secondTeam.mechs[i]);
+            if (t1)
+            {
+                if (i < firstTeam.mechs.Count)
+                {
+                    while (firstTeam.mechs[i].Destroyed)
+                    {
+                        i++;
+                        n++;
+                        if (i >= firstTeam.mechs.Count)
+                            break;
+                    }
+                    if (i < firstTeam.mechs.Count)
+                    {
+                        turnOrder.Add(firstTeam.mechs[i]);
+                        i++;
+                        n++;
+                    }
+                }
+                t1 = false;
+            }
+            else
+            {
+                if (j < secondTeam.mechs.Count)
+                {
+                    while (secondTeam.mechs[j].Destroyed)
+                    {
+                        j++;
+                        n++;
+                        if (j >= secondTeam.mechs.Count)
+                            break;
+                    }
+                    if (j < secondTeam.mechs.Count)
+                    {
+                        turnOrder.Add(secondTeam.mechs[j]);
+                        j++;
+                        n++;
+                    }
+                }
+                t1 = true;
+            }
         }
+        string text = "TurnOrder: ";
+        for (int z = 0; z < turnOrder.Count; ++z)
+            text += turnOrder[z].mechType + " -> ";
+        Stream(text);
     }
 
     // Determine first and second team as per initiative roll. first team lost initiative roll. second team won.
@@ -211,7 +271,7 @@ public class BattleTechSim : MonoBehaviour
 
     int GetWinningTeam()
     {
-        foreach(Mech mech in teams[0].mechs)
+        foreach (Mech mech in teams[0].mechs)
         {
             if (!mech.Destroyed)
                 return 0;
@@ -221,13 +281,21 @@ public class BattleTechSim : MonoBehaviour
 
     internal void StartSimulation(MechData[] t)
     {
-        Debug.Log("Start sim.");
         teams = t;
         isStreaming = true;
         battleState = State.Begin;
     }
 
-    internal void Stream(string text)
+    private void FlushStream()
+    {
+        if (string.IsNullOrEmpty(streamBuffer))
+            return;
+
+        Stream(streamBuffer);
+        streamBuffer = string.Empty;
+    }
+
+    private void Stream(string text)
     {
         battleStream.text += text + "\n";
         lineIndex++;

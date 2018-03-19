@@ -284,6 +284,7 @@
   <ItemGroup>
     <Compile Include="Assets\BattleTechSetup.cs" />
     <Compile Include="Assets\BattleTechSim.cs" />
+    <Compile Include="Assets\BattleTechTables.cs" />
     <Compile Include="Assets\JsonTest.cs" />
     <Compile Include="Assets\Mech.cs" />
     <Compile Include="Assets\Weapon.cs" />
