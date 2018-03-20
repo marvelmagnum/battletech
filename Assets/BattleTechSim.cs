@@ -111,7 +111,6 @@ public class BattleTechSim : MonoBehaviour
                 }
                 target = GetOpponent(attacker);
                 firingCount = attacker.GenerateFiringCount();   // Determine number of weapons mech will fire
-                Stream(attacker.mechType + " is firing " + firingCount + " weapons. ");
                 if (firingCount == 0)
                     Stream(attacker.mechType + " has no usable weapons.");
                 battleState = firingCount > 0 ? State.Weapon : State.NextMech;  // If no usable weapons, move to next mech in turn. Else use weapons.
@@ -119,6 +118,11 @@ public class BattleTechSim : MonoBehaviour
 
             // Fire weapon
             case State.Weapon:
+                if (target.Destroyed)
+                {
+                    battleState = State.NextMech;
+                    break;
+                }
                 damage = attacker.FireWeapon(target);
                 FlushStream();
                 battleState = State.Damage;
@@ -129,7 +133,6 @@ public class BattleTechSim : MonoBehaviour
                 target.Damage(damage);
                 FlushStream();
                 battleState = --firingCount > 0 ? State.Weapon : State.NextMech;    // If more weapons to fire, shoot else next mech
-                Stream(attacker.mechType + " has " + firingCount + " weapons to fire.");
                 break;
 
             // next mech in turn order or start next round 
@@ -143,7 +146,6 @@ public class BattleTechSim : MonoBehaviour
                 attacker.RechargeWeapons();     // reset all weapons
                 turnIndex++;
                 battleState = turnIndex < turnOrder.Count ? State.FindOpponent : State.Initiative;  // if more mech to go this round, then next mech. Else end round.
-                Stream("Next mech.");
                 break;
 
             // Battle ends

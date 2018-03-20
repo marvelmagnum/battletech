@@ -23,6 +23,16 @@ public class Weapon
         set;
     }
 
+    internal Weapon BuildWeapon()
+    {
+        Weapon newWeapon = (Weapon)this.MemberwiseClone();
+        newWeapon.type = string.Copy(type);
+        newWeapon.category = (Category)Enum.Parse(typeof(Category), categoryValue);
+        newWeapon.HasFired = false;
+
+        return newWeapon;
+}
+
     internal void Assemble(string locationCode)
     {
         List<string> mechLocations = Enum.GetNames(typeof(MechLocation)).ToList();
@@ -36,8 +46,7 @@ public class Weapon
             }
         }
 
-        category = (Category)Enum.Parse(typeof(Category), categoryValue);
-        HasFired = false;
+        
     }
 
     // Returns false if ammo exhausted
@@ -55,7 +64,8 @@ public class Weapon
                     if (ammo.ammoType.Equals(type) && ammo.rounds > 0)
                     {
                         ammo.rounds--;
-                        BattleTechSim.Instance.streamBuffer += ammo.rounds + " ammo remains. ";
+                        if (ammo.rounds > 0)
+                            BattleTechSim.Instance.streamBuffer += ammo.rounds + " ammo remains. ";
                         return ammo.rounds > 0 ? true : false;
                     }
                 }

@@ -204,7 +204,6 @@ public class BattleTechSetup : MonoBehaviour
     {
         // Retrive Chassis
         Mech newMech = GetMech(selectedMech);
-        newMech.Init();
         
         // Attach Weapons
         foreach (string weaponItem in selectedWeapons)
@@ -230,12 +229,12 @@ public class BattleTechSetup : MonoBehaviour
 
     private Mech GetMech(string selectedMech)
     {
-        Mech ret = new Mech();
+        Mech ret = null;
         foreach (Mech mech in mechData.mechs)
         {
             if (mech.mechType.Equals(selectedMech))
             {
-                ret = mech;
+                ret = mech.BuildMech();
                 break;
             }
         }
@@ -244,12 +243,12 @@ public class BattleTechSetup : MonoBehaviour
 
     private Weapon GetWeapon(string weaponItem)
     {
-        Weapon ret = new Weapon();
+        Weapon ret = null;
         foreach (Weapon weapon in weaponData.weapons)
         {
             if (weapon.type.Equals(weaponItem))
             {
-                ret = weapon;
+                ret = weapon.BuildWeapon();
                 break;
             }
         }
