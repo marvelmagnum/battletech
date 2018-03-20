@@ -60,10 +60,10 @@ public class BattleTechSetup : MonoBehaviour
 
     private void LoadData()
     {
-        string mechJson = File.ReadAllText(Application.dataPath + "/MechData.txt");
+        string mechJson = File.ReadAllText(Application.dataPath + "/Data/MechData.txt");
         mechData = JsonUtility.FromJson<MechData>(mechJson);
 
-        string weaponJson = File.ReadAllText(Application.dataPath + "/WeaponData.txt");
+        string weaponJson = File.ReadAllText(Application.dataPath + "/Data/WeaponData.txt");
         weaponData = JsonUtility.FromJson<WeaponData>(weaponJson);
     }
 
