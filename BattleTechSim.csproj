@@ -282,16 +282,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\BattleTechSetup.cs" />
-    <Compile Include="Assets\BattleTechSim.cs" />
-    <Compile Include="Assets\BattleTechTables.cs" />
-    <Compile Include="Assets\JsonTest.cs" />
-    <Compile Include="Assets\Mech.cs" />
-    <Compile Include="Assets\Weapon.cs" />
+    <Compile Include="Assets\Scripts\BattleTechSetup.cs" />
+    <Compile Include="Assets\Scripts\BattleTechSim.cs" />
+    <Compile Include="Assets\Scripts\BattleTechTables.cs" />
+    <Compile Include="Assets\Scripts\JsonTest.cs" />
+    <Compile Include="Assets\Scripts\Mech.cs" />
+    <Compile Include="Assets\Scripts\MechStatus.cs" />
+    <Compile Include="Assets\Scripts\Weapon.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\MechData.txt" />
-    <None Include="Assets\WeaponData.txt" />
+    <None Include="Assets\Data\MechData.txt" />
+    <None Include="Assets\Data\WeaponData.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

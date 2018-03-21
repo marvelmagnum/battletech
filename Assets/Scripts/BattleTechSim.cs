@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +20,9 @@ public class BattleTechSim : MonoBehaviour
 
     public Text battleStream;
     public float streamDelay;
+    public Transform[] teamrows;
+    public GameObject mechPrefab;
+
 
     private const int maxLines = 26;
     private const string pageEnd = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\nContinue...";
@@ -86,6 +90,7 @@ public class BattleTechSim : MonoBehaviour
             // Start Battle
             case State.Begin:
                 Stream("Battle starts.");
+                SetupTeamStatus();  // Setup the mech status hud
                 battleState = State.Initiative;
                 break;
 
@@ -159,13 +164,29 @@ public class BattleTechSim : MonoBehaviour
         }
     }
 
+    private void SetupTeamStatus()
+    {
+        for (int i = 0; i < teams.Length; ++i)
+        {
+            for (int j = 0; j < teams[i].mechs.Count; j++)
+            {
+                GameObject mechItem = GameObject.Instantiate(mechPrefab);
+                MechStatus status = mechItem.GetComponent<MechStatus>();
+                status.Init(teams[i].mechs[j], i);
+                teams[i].mechs[j].AttachStatus(status);
+                mechItem.transform.SetParent(teamrows[i]);
+                mechItem.transform.localPosition = new Vector3(-120f * j, 0, 0);
+            }
+        }
+    }
+
     private Mech GetOpponent(Mech thisMech)
     {
         int oppTeam = thisMech.Team ^ 1; // Toggles between 1 and 0.
         Mech opp;
         do
         {
-            opp = teams[oppTeam].mechs[Random.Range(0, teams[oppTeam].mechs.Count)];
+            opp = teams[oppTeam].mechs[UnityEngine.Random.Range(0, teams[oppTeam].mechs.Count)];
         } while (opp.Destroyed);
         return opp;
     }

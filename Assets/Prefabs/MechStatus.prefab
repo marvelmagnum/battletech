@@ -104,6 +104,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 224093313826130344}
+  - component: {fileID: 114914132597828984}
   m_Layer: 5
   m_Name: MechStatus
   m_TagString: Untagged
@@ -259,18 +260,18 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_FontSize: 16
     m_FontStyle: 1
     m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_MinSize: 1
+    m_MaxSize: 16
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: HER-2S Hermes II
+  m_Text: xyz
 --- !u!114 &114430498671238696
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -487,6 +488,27 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114914132597828984
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1616998537363914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: deab0b305a1c7114aac94a2de76b71a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mechLabel: {fileID: 114388503016275620}
+  mechParts:
+  - {fileID: 114863201021578980}
+  - {fileID: 114826140816915186}
+  - {fileID: 114548672284681844}
+  - {fileID: 114207551889104338}
+  - {fileID: 114718545655299700}
+  - {fileID: 114430498671238696}
+  - {fileID: 114479003927902824}
+  - {fileID: 114814476026670280}
 --- !u!222 &222005926457734124
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -637,7 +659,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -84.06}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 115, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224449469679375320
 RectTransform:

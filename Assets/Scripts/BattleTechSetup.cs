@@ -150,6 +150,8 @@ public class BattleTechSetup : MonoBehaviour
         List<string> selectedAmmunitions = new List<string>();
 
         Text[] items = buildListContents[team].GetComponentsInChildren<Text>();
+        if (items.Length == 0) return;
+
         foreach(Text buildItem in items)
         {
             if (buildItem.text.Contains(TypeMech))

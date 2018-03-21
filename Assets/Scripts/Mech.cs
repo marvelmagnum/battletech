@@ -11,16 +11,26 @@ public class Mech
     public MechWarrior mechWarrior;
     public ArmorValues[] armorValues;
 
-    Dictionary<MechLocation, int> armor = new Dictionary<MechLocation, int>();
-    List<Weapon> weapons = new List<Weapon>();
-    List<Ammo> ammunitions = new List<Ammo>();
-
-    List<Weapon> disabledWeapons = new List<Weapon>();
+    private Dictionary<MechLocation, int> armor = new Dictionary<MechLocation, int>();
+    private List<Weapon> weapons = new List<Weapon>();
+    private List<Ammo> ammunitions = new List<Ammo>();
+    private List<Weapon> disabledWeapons = new List<Weapon>();
+    private MechStatus status;
 
     internal bool Destroyed
     {
         get;
         private set;
+    }
+
+    internal float GetMaxArmor(string locationName)
+    {
+        foreach (ArmorValues aValues in armorValues)
+        {
+            if (aValues.location.Equals(locationName))
+                return aValues.armor;
+        }
+        return -1;
     }
 
     internal int Team
@@ -50,6 +60,11 @@ public class Mech
         }
     }
 
+    internal int GetPartArmor(MechLocation location)
+    {
+        return armor[location];
+    }
+
     internal void AttachWeapon(Weapon weapon)
     {
         weapons.Add(weapon);
@@ -58,6 +73,11 @@ public class Mech
     internal void LoadAmmo(Ammo ammo)
     {
         ammunitions.Add(ammo);
+    }
+
+    internal void AttachStatus(MechStatus mStatus)
+    {
+        status = mStatus;
     }
 
     internal int GenerateFiringCount()
@@ -91,6 +111,7 @@ public class Mech
     {
         MechLocation damageLocation = BattleTechTables.Instance.LookupHitLocation();
         AssignDamage(damageLocation, damage);
+        status.UpdateDamage(this);
     }
 
     private void AssignDamage(MechLocation location, int damage)
