@@ -1,4 +1,4 @@
-{
+   {
     "mechs": [
         {
             "mechType": "HER-2S Hermes II",
@@ -15,34 +15,42 @@
             "armorValues": [
                 {
                     "location": "Head",
+					"structure":3,
                     "armor": 9
                 },
                 {
                     "location": "LeftTorso",
+					"structure":10,
                     "armor": 14
                 },
                 {
                     "location": "RightTorso",
+					"structure":10,
                     "armor": 14
                 },
                 {
                     "location": "CenterTorso",
+					"structure":12,
                     "armor": 17
                 },
                 {
                     "location": "LeftArm",
+					"structure":6,
                     "armor": 11
                 },
                 {
                     "location": "RightArm",
+					"structure":6,
                     "armor": 11
                 },
                 {
                     "location": "LeftLeg",
+					"structure":10,
                     "armor": 14
                 },
                 {
                     "location": "RightLeg",
+					"structure":10,
                     "armor": 14
                 }
             ]
@@ -62,34 +70,42 @@
             "armorValues": [
                 {
                     "location": "Head",
+					"structure":3,
                     "armor": 9
                 },
                 {
                     "location": "LeftTorso",
+					"structure":12,
                     "armor": 20
                 },
                 {
                     "location": "RightTorso",
+					"structure":12,
                     "armor": 20
                 },
                 {
                     "location": "CenterTorso",
+					"structure":16,
                     "armor": 26
                 },
                 {
                     "location": "LeftArm",
+					"structure":8,
                     "armor": 16
                 },
                 {
                     "location": "RightArm",
+					"structure":8,
                     "armor": 16
                 },
                 {
                     "location": "LeftLeg",
+					"structure":12,
                     "armor": 20
                 },
                 {
                     "location": "RightLeg",
+					"structure":12,
                     "armor": 20
                 }
             ]
@@ -109,34 +125,42 @@
             "armorValues": [
                 {
                     "location": "Head",
+					"structure": 3,
                     "armor": 9
                 },
                 {
                     "location": "LeftTorso",
+					"structure": 10,
                     "armor": 6
                 },
                 {
                     "location": "RightTorso",
+					"structure":10,
                     "armor": 6
                 },
                 {
                     "location": "CenterTorso",
+					"structure":12,
                     "armor": 11
                 },
                 {
                     "location": "LeftArm",
+					"structure":6,
                     "armor": 4
                 },
                 {
                     "location": "RightArm",
+					"structure":6,
                     "armor": 4
                 },
                 {
                     "location": "LeftLeg",
+					"structure":10,
                     "armor": 6
                 },
                 {
                     "location": "RightLeg",
+					"structure":10,
                     "armor": 6
                 }
             ]
@@ -156,34 +180,42 @@
             "armorValues": [
                 {
                     "location": "Head",
+					"structure":3,
                     "armor": 9
                 },
                 {
                     "location": "LeftTorso",
+					"structure":12,
                     "armor": 17
                 },
                 {
                     "location": "RightTorso",
+					"structure":12,
                     "armor": 17
                 },
                 {
                     "location": "CenterTorso",
+					"structure":16,
                     "armor": 23
                 },
                 {
                     "location": "LeftArm",
+					"structure":8,
                     "armor": 14
                 },
                 {
                     "location": "RightArm",
+					"structure":8,
                     "armor": 14
                 },
                 {
                     "location": "LeftLeg",
+					"structure":12,
                     "armor": 20
                 },
                 {
                     "location": "RightLeg",
+					"structure":12,
                     "armor": 20
                 }
             ]

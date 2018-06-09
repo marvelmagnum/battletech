@@ -9,9 +9,11 @@ public class Mech
     public MovementPoint movementPoint;
     public int tonnage;
     public MechWarrior mechWarrior;
+
     public ArmorValues[] armorValues;
 
     private Dictionary<MechLocation, int> armor = new Dictionary<MechLocation, int>();
+    private Dictionary<MechLocation, int> structure = new Dictionary<MechLocation, int>();
     private List<Weapon> weapons = new List<Weapon>();
     private List<Ammo> ammunitions = new List<Ammo>();
     private List<Weapon> disabledWeapons = new List<Weapon>();
@@ -33,6 +35,16 @@ public class Mech
         return -1;
     }
 
+    internal float GetMaxStructure(string locationName)
+    {
+        foreach (ArmorValues aValues in armorValues)
+        {
+            if (aValues.location.Equals(locationName))
+                return aValues.structure;
+        }
+        return -1;
+    }
+
     internal int Team
     {
         get; set;
@@ -40,22 +52,26 @@ public class Mech
 
     internal Mech BuildMech()
     {
-        BuildArmor();   // set armor values from json data
+        BuildArmorStructure();       // set armor values from json data
 
         Mech newMech = (Mech)this.MemberwiseClone();
         newMech.mechType = string.Copy(mechType);
+        newMech.structure = new Dictionary<MechLocation, int>(structure);
         newMech.armor = new Dictionary<MechLocation, int>(armor);
+        
         newMech.Destroyed = false;
 
         return newMech;
     }
 
-    private void BuildArmor()
+    private void BuildArmorStructure()
     {
+        structure.Clear();
         armor.Clear();
         foreach (ArmorValues a in armorValues)
         {
             MechLocation loc = (MechLocation)Enum.Parse(typeof(MechLocation), a.location);
+            structure[loc] = a.structure;
             armor[loc] = a.armor;
         }
     }
@@ -63,6 +79,11 @@ public class Mech
     internal int GetPartArmor(MechLocation location)
     {
         return armor[location];
+    }
+
+    internal int GetPartStructure(MechLocation location)
+    {
+        return structure[location];
     }
 
     internal void AttachWeapon(Weapon weapon)
@@ -117,11 +138,13 @@ public class Mech
     private void AssignDamage(MechLocation location, int damage)
     {
         if (Destroyed) return;
-         
-        if (damage < armor[location])
+
+        if (damage <= armor[location])
         {
             armor[location] -= damage;
             BattleTechSim.Instance.streamBuffer += mechType + " takes " + damage + " damage to the " + location.ToString() + ". ";
+            if (armor[location] == 0)
+                BattleTechSim.Instance.streamBuffer += location.ToString() + " armor depleted. ";
             return;
         }
         else              // extra damage transfers inward
@@ -130,9 +153,26 @@ public class Mech
             {
                 damage -= armor[location];
                 armor[location] = 0;
+                BattleTechSim.Instance.streamBuffer += location.ToString() + " armor depleted. ";
+            }
+        }
+
+        if (damage < structure[location])
+        {
+            structure[location] -= damage;
+            BattleTechSim.Instance.streamBuffer += mechType + " takes " + damage + " internal damage to the " + location.ToString() + ". ";
+            return;
+        }
+        else
+        {
+            if (structure[location] > 0)
+            {
+                damage -= structure[location];
+                structure[location] = 0;
                 BattleTechSim.Instance.streamBuffer += location.ToString() + " destroyed. ";
                 DestroyWeapons(location);
             }
+        
             // Check if mech destroyed
             if (location == MechLocation.Head || location == MechLocation.CenterTorso)
             {
@@ -205,6 +245,7 @@ public struct MechWarrior
 public struct ArmorValues
 {
     public string location;
+    public int structure;
     public int armor;
 }
 
